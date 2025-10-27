@@ -16,7 +16,7 @@ interface OrderDao{
 
     //get order byID
     @Query("SELECT * FROM orders WHERE id = :orderId")
-    fun getOrderById(orderId: Int): Order?
+    suspend fun getOrderById(orderId: Int): Order?
 
     //getOrderByStatus
     @Query("SELECT * FROM orders WHERE status = :status ORDER BY createdAt DESC")

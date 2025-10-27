@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import com.example.food_delivery_app.data.model.CartItem
 import kotlinx.coroutines.flow.Flow
 
@@ -17,14 +18,14 @@ interface CartDao {
 
     //getCartItemByFoodId
     @Query("SELECT * FROM cart_items WHERE foodId = :foodId")
-    fun getCartItemByFoodId(foodId: Int): CartItem?
+    suspend fun getCartItemByFoodId(foodId: Int): CartItem?
 
     //addNewCartItem
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCartItem(cartItem: CartItem)
 
     //updateCartItem
-    @Insert
+    @Update
     suspend fun updateCartItem(cartItem: CartItem)
 
     @Delete

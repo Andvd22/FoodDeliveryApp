@@ -1,9 +1,11 @@
 package com.example.food_delivery_app.data.database
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import com.example.food_delivery_app.data.model.Food
 import kotlinx.coroutines.flow.Flow
 
@@ -23,7 +25,7 @@ interface FoodDao {
 
     //getFoodById
     @Query("Select * FROM foods WHERE id = :foodId")
-    fun getFoodById(foodId: Int): Food?
+    suspend fun getFoodById(foodId: Int): Food?
 
     //addNewFood
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -34,9 +36,9 @@ interface FoodDao {
     suspend fun insertFoods(foods: List<Food>)
 
     //updateFood
-    @Insert
+    @Update
     suspend fun updateFood(food: Food)
 
-    @Insert
+    @Delete
     suspend fun deleteFood(food: Food)
 }
