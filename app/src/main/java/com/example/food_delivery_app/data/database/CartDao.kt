@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.Flow
 interface CartDao {
     //getAllItemInCart
     @Query("SELECT * FROM cart_items")
-    fun getAddCartItems(): Flow<List<CartItem>>
+    fun getAllCartItems(): Flow<List<CartItem>>
 
     //getCartItemByFoodId
     @Query("SELECT * FROM cart_items WHERE foodId = :foodId")
