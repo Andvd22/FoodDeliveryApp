@@ -1,4 +1,4 @@
-package com.example.food_delivery_app
+package com.example.food_delivery_app.ui.home
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
