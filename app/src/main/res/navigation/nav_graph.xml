@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/homeFragment">
+    app:startDestination="@id/cartFragment">
 
     <fragment
         android:id="@+id/homeFragment"
@@ -17,11 +17,11 @@
         android:label="Thực đơn"
         tools:layout="@layout/fragment_menu" />
 
-<!--    <fragment-->
-<!--        android:id="@+id/cartFragment"-->
-<!--        android:name="com.example.food_delivery_app.ui.cart.CartFragment"-->
-<!--        android:label="Giỏ hàng"-->
-<!--        tools:layout="@layout/fragment_cart" />-->
+    <fragment
+        android:id="@+id/cartFragment"
+        android:name="com.example.food_delivery_app.ui.cart.CartFragment"
+        android:label="Giỏ hàng"
+        tools:layout="@layout/fragment_cart" />
 
 <!--    <fragment-->
 <!--        android:id="@+id/orderFragment"-->
