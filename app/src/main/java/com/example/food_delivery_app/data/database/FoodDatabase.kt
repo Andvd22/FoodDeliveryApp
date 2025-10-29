@@ -4,6 +4,10 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.example.food_delivery_app.data.database.DAO.CartDao
+import com.example.food_delivery_app.data.database.DAO.FoodDao
+import com.example.food_delivery_app.data.database.DAO.OrderDao
+import com.example.food_delivery_app.data.database.DAO.OrderItemDao
 import com.example.food_delivery_app.data.model.CartItem
 import com.example.food_delivery_app.data.model.Food
 import com.example.food_delivery_app.data.model.Order

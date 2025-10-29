@@ -1,6 +1,6 @@
 package com.example.food_delivery_app.data.repository
 
-import com.example.food_delivery_app.data.database.FoodDao
+import com.example.food_delivery_app.data.database.DAO.FoodDao
 import com.example.food_delivery_app.data.model.Food
 import kotlinx.coroutines.flow.Flow
 
