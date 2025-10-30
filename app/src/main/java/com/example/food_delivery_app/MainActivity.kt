@@ -5,6 +5,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
@@ -14,19 +16,19 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-//        setupBottomNavigation()
+        setupBottomNavigation()
     }
 
-//    private fun setupBottomNavigation(){
-//        // Lấy BottomNavigationView từ layout
-//        bottomNavigationView = findViewById(R.id.bottom_navigation)
-//
-//        // Lấy NavHostFragment và NavController
-//        val navHostFragment = supportFragmentManager
-//            .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-//        val navController = navHostFragment.navController
-//
-//        // Kết nối BottomNavigationView với NavController
-//        bottomNavigationView.setupWithNavController(navController)
-//    }
+    private fun setupBottomNavigation(){
+        // Lấy BottomNavigationView từ layout
+        bottomNavigation = findViewById(R.id.bottom_navigation)
+
+        // Lấy NavHostFragment và NavController
+        val navHostFragment = supportFragmentManager
+            .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        val navController = navHostFragment.navController
+
+        // Kết nối BottomNavigationView với NavController
+        bottomNavigation.setupWithNavController(navController)
+    }
 }

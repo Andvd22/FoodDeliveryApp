@@ -29,10 +29,10 @@
         android:label="Đơn hàng"
         tools:layout="@layout/fragment_order" />
 
-<!--    <fragment-->
-<!--        android:id="@+id/profileFragment"-->
-<!--        android:name="com.example.food_delivery_app.ui.profile.ProfileFragment"-->
-<!--        android:label="Cá nhân"-->
-<!--        tools:layout="@layout/fragment_profile" />-->
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.food_delivery_app.ui.profile.ProfileFragment"
+        android:label="Cá nhân"
+        tools:layout="@layout/fragment_profile" />
 
 </navigation>
