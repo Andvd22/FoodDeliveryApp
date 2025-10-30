@@ -5,8 +5,13 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.example.food_delivery_app.R
 import com.example.food_delivery_app.databinding.FragmentProfileBinding
+import kotlinx.coroutines.launch
 
 
 class ProfileFragment : Fragment() {
@@ -14,6 +19,7 @@ class ProfileFragment : Fragment() {
     private var _binding: FragmentProfileBinding? = null
 
     private val binding get() = _binding!!
+    private val viewModel: ProfileViewModel by viewModels()
 
     private lateinit var menuAdapter: ProfileMenuAdapter
 
@@ -27,16 +33,10 @@ class ProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupHeaderMock()
         setupRecyclerView()
-        loadMenuMockData()
+        collectState()
     }
 
-    private fun setupHeaderMock() = with(binding){
-        textUserName.text = "Đỗ Văn An"
-        textUserPhone.text = "1900100có"
-        imageAvatar.setImageResource(R.drawable.ic_launcher_foreground)
-    }
 
     private fun setupRecyclerView(){
         menuAdapter = ProfileMenuAdapter(
@@ -45,17 +45,25 @@ class ProfileFragment : Fragment() {
         binding.recyclerProfileMenu.adapter = menuAdapter
     }
 
-    private fun loadMenuMockData() {
-        val items = listOf(
-            ProfileMenuItem(iconResId = R.drawable.ic_launcher_foreground, title = "Địa chỉ giao hàng"),
-            ProfileMenuItem(iconResId = R.drawable.ic_launcher_foreground, title = "Phương thức thanh toán"),
-            ProfileMenuItem(iconResId = R.drawable.ic_launcher_foreground, title = "Lịch sử đơn hàng"),
-            ProfileMenuItem(iconResId = R.drawable.ic_launcher_foreground, title = "Cài đặt"),
-            ProfileMenuItem(iconResId = R.drawable.ic_launcher_foreground, title = "Đăng xuất")
-        )
-        menuAdapter.submitList(items)
-    }
 
+    private fun collectState() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.user.collect { profile ->
+                        binding.textUserName.text = profile.name
+                        binding.textUserPhone.text = profile.phone
+                        binding.imageAvatar.setImageResource(profile.avatarResId)
+                    }
+                }
+                launch {
+                    viewModel.menu.collect { items ->
+                        menuAdapter.submitList(items)
+                    }
+                }
+            }
+        }
+    }
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
