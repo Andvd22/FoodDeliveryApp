@@ -5,7 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.example.food_delivery_app.databinding.FragmentCartBinding
+import kotlinx.coroutines.launch
 
 class CartFragment : Fragment() {
 
@@ -13,7 +18,7 @@ class CartFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var cartAdapter: CartItemAdapter
-    private var localItems: MutableList<CartDisplay> = mutableListOf()
+    private val viewModel: CartViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -27,56 +32,40 @@ class CartFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
-        loadMockData()
-        updateTotal()
+        collectState()
     }
 
     private fun setupRecyclerView() {
         cartAdapter = CartItemAdapter(
             onIncrease = { item, _ ->
-                val updated = item.copy(quantity = item.quantity + 1)
-                replaceItem(updated)
-                updateTotal()
+                viewModel.increase(item.name)
             },
             onDecrease = { item, _ ->
-                val newQty = (item.quantity - 1).coerceAtLeast(1)
-                val updated = item.copy(quantity = newQty)
-                replaceItem(updated)
-                updateTotal()
+                viewModel.decrease(item.name)
             }
         )
         binding.recyclerCartItems.adapter = cartAdapter
     }
 
-    private fun loadMockData() {
-        localItems = mutableListOf(
-            CartDisplay(
-                imageUrl = "https://picsum.photos/200?pizza2",
-                name = "Pizza Hải Sản",
-                price = 14.49,
-                quantity = 1
-            ),
-            CartDisplay(
-                imageUrl = "https://picsum.photos/200?burger2",
-                name = "Burger Gà Giòn",
-                price = 8.25,
-                quantity = 2
-            )
-        )
-        cartAdapter.submitList(localItems.toList())
-    }
+    private fun collectState() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
 
-    private fun replaceItem(updated: CartDisplay) {
-        val idx = localItems.indexOfFirst { it.name == updated.name }
-        if (idx != -1) {
-            localItems[idx] = updated
-            cartAdapter.submitList(localItems.toList())
+                // Collect list items
+                launch {
+                    viewModel.items.collect { list ->
+                        cartAdapter.submitList(list)
+                    }
+                }
+
+                // Collect total amount
+                launch {
+                    viewModel.totalAmount.collect { total ->
+                        binding.textTotalAmount.text = "Tổng: $${"%.2f".format(total)}"
+                    }
+                }
+            }
         }
-    }
-
-    private fun updateTotal() {
-        val total = localItems.sumOf { it.price * it.quantity }
-        binding.textTotalAmount.text = "Tổng: $${"%.2f".format(total)}"
     }
 
     override fun onDestroyView() {
