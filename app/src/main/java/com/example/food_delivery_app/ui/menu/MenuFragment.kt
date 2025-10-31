@@ -6,11 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.food_delivery_app.databinding.FragmentMenuBinding
+import com.example.food_delivery_app.ui.cart.CartViewModel
 import kotlinx.coroutines.launch
 
 
@@ -19,6 +21,8 @@ class MenuFragment : Fragment() {
     private var _binding: FragmentMenuBinding? = null
     private val binding get() = _binding!!
     private val viewModel: MenuViewModel by viewModels()
+
+    private val cartViewModel: CartViewModel by activityViewModels()
 
     private lateinit var foodAdapter: FoodAdapter
 
@@ -40,6 +44,7 @@ class MenuFragment : Fragment() {
         foodAdapter = FoodAdapter(
             onItemClick = {},
             onAddToCartClick = { food ->
+                cartViewModel.addToCart(food)
                 Toast.makeText(requireContext(), "Thêm ${food.name} vào giỏ hàng", Toast.LENGTH_SHORT).show()
             }
         )

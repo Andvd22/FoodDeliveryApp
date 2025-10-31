@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -18,7 +19,9 @@ class OrderFragment : Fragment() {
     private var _binding: FragmentOrderBinding? = null
 
     private val binding get() = _binding!!
-    private val viewModel: OrderViewModel by viewModels()
+
+    private val orderViewModel: OrderViewModel by activityViewModels()
+//    private val viewModel: OrderViewModel by viewModels()
     private lateinit var orderAdapter: OrderAdapter
 
 
@@ -46,7 +49,7 @@ class OrderFragment : Fragment() {
     private fun collectState() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.orders.collect { orderList ->
+                orderViewModel.orders.collect { orderList ->
                     orderAdapter.submitList(orderList)
                 }
             }

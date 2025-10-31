@@ -2,6 +2,7 @@ package com.example.food_delivery_app.ui.cart
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.food_delivery_app.data.model.Food
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -78,6 +79,29 @@ class CartViewModel : ViewModel(){
     fun clear() {
         viewModelScope.launch {
             _items.value = emptyList()
+            recalcTotal()
+        }
+    }
+
+    fun addToCart(food: Food) {
+        viewModelScope.launch {
+            _items.update { currentList ->
+                val index = currentList.indexOfFirst { cartDisplay -> cartDisplay.name == food.name }
+                if (index == -1) {
+                    // Món chưa có thì thêm mới
+                    currentList + CartDisplay(
+                        imageUrl = food.imageUrl,
+                        name = food.name,
+                        price = food.price,
+                        quantity = 1
+                    )
+                } else {
+                    // Đã có, tăng số lượng
+                    currentList.mapIndexed { idx, cartDisplay ->
+                        if (idx == index) cartDisplay.copy(quantity = cartDisplay.quantity + 1) else cartDisplay
+                    }
+                }
+            }
             recalcTotal()
         }
     }
