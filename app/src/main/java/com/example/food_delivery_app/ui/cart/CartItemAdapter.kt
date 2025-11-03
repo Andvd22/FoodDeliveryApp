@@ -10,6 +10,7 @@ import kotlinx.coroutines.withContext
 
 //UI model mock
 data class CartDisplay(
+    val foodId: Int,
     val imageUrl: String,
     val name: String,
     val price: Double,

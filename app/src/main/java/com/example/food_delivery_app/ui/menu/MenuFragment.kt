@@ -12,6 +12,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.food_delivery_app.databinding.FragmentMenuBinding
+import com.example.food_delivery_app.FoodDeliveryApp
+import com.example.food_delivery_app.ui.menu.MenuViewModelFactory
 import com.example.food_delivery_app.ui.cart.CartViewModel
 import kotlinx.coroutines.launch
 
@@ -20,7 +22,10 @@ class MenuFragment : Fragment() {
 
     private var _binding: FragmentMenuBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: MenuViewModel by viewModels()
+    private val viewModel: MenuViewModel by viewModels {
+        val app = requireActivity().application as FoodDeliveryApp
+        MenuViewModelFactory(app.container.foodRepository)
+    }
 
     private val cartViewModel: CartViewModel by activityViewModels()
 

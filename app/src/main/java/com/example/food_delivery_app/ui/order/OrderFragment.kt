@@ -12,6 +12,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.food_delivery_app.R
 import com.example.food_delivery_app.databinding.FragmentOrderBinding
+import com.example.food_delivery_app.FoodDeliveryApp
+import com.example.food_delivery_app.ui.order.OrderViewModelFactory
 import kotlinx.coroutines.launch
 
 class OrderFragment : Fragment() {
@@ -20,7 +22,10 @@ class OrderFragment : Fragment() {
 
     private val binding get() = _binding!!
 
-    private val orderViewModel: OrderViewModel by activityViewModels()
+    private val orderViewModel: OrderViewModel by activityViewModels() {
+        val app = requireActivity().application as FoodDeliveryApp
+        OrderViewModelFactory(app.container.orderRepository)
+    }
 //    private val viewModel: OrderViewModel by viewModels()
     private lateinit var orderAdapter: OrderAdapter
 

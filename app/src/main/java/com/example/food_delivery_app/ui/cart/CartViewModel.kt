@@ -3,13 +3,18 @@ package com.example.food_delivery_app.ui.cart
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.food_delivery_app.data.model.Food
+import com.example.food_delivery_app.data.repository.CartRepository
+import com.example.food_delivery_app.data.repository.FoodRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
-class CartViewModel : ViewModel(){
+class CartViewModel(
+    private val cartRepository: CartRepository,
+    private val foodRepository: FoodRepository
+) : ViewModel(){
     private val _items = MutableStateFlow<List<CartDisplay>>(emptyList())
     val items: StateFlow<List<CartDisplay>> = _items.asStateFlow()
 
@@ -17,92 +22,77 @@ class CartViewModel : ViewModel(){
     val totalAmount: StateFlow<Double> = _totalAmount.asStateFlow()
 
     init {
-        seedMock()
+        observeCart()
     }
 
-    private fun seedMock() {
-        val mock = listOf(
-            CartDisplay(
-                imageUrl = "https://picsum.photos/200?pizza2",
-                name = "Pizza Hải Sản",
-                price = 14.49,
-                quantity = 1
-            ),
-            CartDisplay(
-                imageUrl = "https://picsum.photos/200?burger2",
-                name = "Burger Gà Giòn",
-                price = 8.25,
-                quantity = 2
-            )
-        )
-        _items.value = mock
-        recalcTotal()
-    }
-
-    private fun recalcTotal() {
-        _totalAmount.value = _items.value.sumOf {  cartItem ->
-            cartItem.price * cartItem.quantity
-        }
-    }
-
-    fun increase(name: String){
+    private fun observeCart() {
         viewModelScope.launch {
-            _items.update { currentList ->
-                currentList.map { cartItem ->
-                    if(cartItem.name == name) cartItem.copy(quantity = cartItem.quantity + 1) else cartItem
+            combine(
+                cartRepository.getAllCartItems(),
+                foodRepository.getAllFoods()
+            ) { cartItems, foods ->
+                val foodById = foods.associateBy { it.id }
+                cartItems.mapNotNull { cartItem ->
+                    val food = foodById[cartItem.foodId] ?: return@mapNotNull null
+                    CartDisplay(
+                        foodId = cartItem.foodId,
+                        imageUrl = food.imageUrl,
+                        name = food.name,
+                        price = food.price,
+                        quantity = cartItem.quantity
+                    )
                 }
+            }.collect { displays ->
+                _items.value = displays
+                _totalAmount.value = displays.sumOf { it.price * it.quantity }
             }
-            recalcTotal()
         }
     }
 
-    fun decrease(name: String){
+    fun increase(foodId: Int){
         viewModelScope.launch {
-            _items.update { currentList ->
-                currentList.map { cartItem ->
-                    if(cartItem.name == name) cartItem.copy(quantity = (cartItem.quantity - 1).coerceAtLeast(1)) else cartItem
-                }
+            val existing = cartRepository.getCartItemByFoodId(foodId)
+            if (existing != null) {
+                cartRepository.updateCartItem(existing.copy(quantity = existing.quantity + 1))
             }
-            recalcTotal()
         }
     }
 
-    fun remove(name: String) {
+    fun decrease(foodId: Int){
         viewModelScope.launch {
-            _items.update { current ->
-                current.filterNot { cartItem ->
-                    cartItem.name == name } }
-            recalcTotal()
+            val existing = cartRepository.getCartItemByFoodId(foodId)
+            if (existing != null) {
+                val newQty = (existing.quantity - 1).coerceAtLeast(1)
+                cartRepository.updateCartItem(existing.copy(quantity = newQty))
+            }
+        }
+    }
+
+    fun remove(foodId: Int) {
+        viewModelScope.launch {
+            cartRepository.removeCartItemByFoodId(foodId)
         }
     }
 
     fun clear() {
         viewModelScope.launch {
-            _items.value = emptyList()
-            recalcTotal()
+            cartRepository.clearCart()
         }
     }
 
     fun addToCart(food: Food) {
         viewModelScope.launch {
-            _items.update { currentList ->
-                val index = currentList.indexOfFirst { cartDisplay -> cartDisplay.name == food.name }
-                if (index == -1) {
-                    // Món chưa có thì thêm mới
-                    currentList + CartDisplay(
-                        imageUrl = food.imageUrl,
-                        name = food.name,
-                        price = food.price,
+            val existing = cartRepository.getCartItemByFoodId(food.id)
+            if (existing == null) {
+                cartRepository.addToCart(
+                    com.example.food_delivery_app.data.model.CartItem(
+                        foodId = food.id,
                         quantity = 1
                     )
-                } else {
-                    // Đã có, tăng số lượng
-                    currentList.mapIndexed { idx, cartDisplay ->
-                        if (idx == index) cartDisplay.copy(quantity = cartDisplay.quantity + 1) else cartDisplay
-                    }
-                }
+                )
+            } else {
+                cartRepository.updateCartItem(existing.copy(quantity = existing.quantity + 1))
             }
-            recalcTotal()
         }
     }
 }

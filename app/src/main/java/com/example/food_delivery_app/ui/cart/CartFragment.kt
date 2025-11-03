@@ -12,6 +12,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.food_delivery_app.databinding.FragmentCartBinding
+import com.example.food_delivery_app.FoodDeliveryApp
 import com.example.food_delivery_app.ui.order.OrderViewModel
 import kotlinx.coroutines.launch
 import kotlin.getValue
@@ -23,7 +24,10 @@ class CartFragment : Fragment() {
 
     private lateinit var cartAdapter: CartItemAdapter
     private val orderViewModel: OrderViewModel by activityViewModels()
-    private val cartViewModel: CartViewModel by activityViewModels()
+    private val cartViewModel: CartViewModel by activityViewModels {
+        val app = requireActivity().application as FoodDeliveryApp
+        CartViewModelFactory(app.container.cartRepository, app.container.foodRepository)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -59,10 +63,10 @@ class CartFragment : Fragment() {
     private fun setupRecyclerView() {
         cartAdapter = CartItemAdapter(
             onIncrease = {item, _ ->
-                cartViewModel.increase(item.name)
+                cartViewModel.increase(item.foodId)
             },
             onDecrease = { item, _ ->
-                cartViewModel.decrease(item.name)
+                cartViewModel.decrease(item.foodId)
             }
         )
         binding.recyclerCartItems.adapter = cartAdapter
