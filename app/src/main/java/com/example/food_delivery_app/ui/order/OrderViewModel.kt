@@ -26,7 +26,8 @@ class OrderViewModel(
     private fun observeOrders() {
         viewModelScope.launch {
             orderRepository.getAllOrders().collect { list ->
-                _orders.value = list.map { it.toDisplay() }
+                _orders.value = list.map { order ->
+                    order.toDisplay() }
             }
         }
     }

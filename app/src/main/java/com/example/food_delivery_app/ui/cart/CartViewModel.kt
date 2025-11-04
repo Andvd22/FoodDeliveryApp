@@ -87,7 +87,8 @@ class CartViewModel(
                 cartRepository.addToCart(
                     com.example.food_delivery_app.data.model.CartItem(
                         foodId = food.id,
-                        quantity = 1
+                        quantity = 1,
+                        specialInstructions = "Không có yêu cầu gì thêm"
                     )
                 )
             } else {
