@@ -6,6 +6,8 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.DocumentsContract
+import android.os.Build
+import android.os.Environment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -68,6 +70,12 @@ class MenuFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
         collectFileList() // Thằng này bây giờ là NGUỒN SỰ THẬT DUY NHẤT
+
+        // Nếu đã có quyền "All files access" (Android 11+) → quét toàn bộ file
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && Environment.isExternalStorageManager()) {
+            viewModel.loadAllFiles(requireContext()) { /* no-op */ }
+            return
+        }
 
         // Nếu đã có thư mục đã chọn và còn quyền → load luôn
         val saved = getSavedTreeUri()

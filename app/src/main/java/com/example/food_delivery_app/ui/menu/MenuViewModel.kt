@@ -58,6 +58,20 @@ class MenuViewModel(
         }
     }
 
+    fun loadAllFiles(
+        context: Context,
+        onResult: (fileList: List<FileItem>) -> Unit
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val list = fileRepository.scanAllFiles(context)
+            _files.value = list
+
+            withContext(Dispatchers.Main) {
+                onResult(list)
+            }
+        }
+    }
+
     /**
      * SỬA LỖI 1: Thêm hàm này để SAF (Cách 2) có thể
      * cập nhật "nguồn sự thật" (ViewModel).
